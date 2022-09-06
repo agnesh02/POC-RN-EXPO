@@ -5,6 +5,8 @@ import { getFirestore } from "firebase/firestore";
 import { doc, getDoc } from "firebase/firestore";
 import { app } from "../../api/FirebaseConfig";
 import { getAuth } from "firebase/auth";
+import { getStorage, ref, getDownloadURL } from "firebase/storage";
+
 
 const ProfileScreen = function({navigation}){
 
@@ -12,16 +14,22 @@ const ProfileScreen = function({navigation}){
     const auth = getAuth(app)
     const userEmail = auth.currentUser?.email
 
+    const firebaseStorage = getStorage(app);
+    const storageRef = ref(firebaseStorage, `USERS/${userEmail}`);
+
+    
     const [fullname, setFullname] = useState('')
     const [username, setUsername] = useState('')
     const [dob, setDob] = useState('')
     const [contact, setContact] = useState('')
-
+    const [imageUrl, setImageUrl] = useState(null);
+    
     const getProfileData = async function(){
 
         const firestore = getFirestore(app)
         const docRef = doc(firestore, "USERS", userEmail)
         const docSnap = await getDoc(docRef)
+        fetchImageUrl()
     
         if(docSnap.exists())
         {
@@ -36,15 +44,27 @@ const ProfileScreen = function({navigation}){
             Toaster("Some error occurred")
         }
     }
+
+    const fetchImageUrl = async function(){
+        await getDownloadURL(storageRef)
+            .then((url) => {
+                setImageUrl(url)
+            })
+            .catch((error) => {
+                //Toaster(error.message)
+            });
+    }
     
     useEffect( () => {
         getProfileData()
+        fetchImageUrl()
     }, [])
     
     return (
         <View>
             <View style={styling.header}></View>
-            <Image style={styling.avatar} source={require('../../assets/user.png')}/>
+            {imageUrl && <Image style={styling.avatar} source={ {uri: imageUrl} } />}
+            {imageUrl === null && <Image style={styling.avatar} source={ require('../../assets/user.png') } />}
 
             <TouchableOpacity style={styling.buttonContainer2}>
                 <Text>Edit Profile</Text>  
