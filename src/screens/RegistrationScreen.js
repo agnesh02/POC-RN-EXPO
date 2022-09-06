@@ -14,17 +14,18 @@ const RegistrationScreen = function(){
     const registerUser = function(){
         createUserWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
-                const user = userCredential.user;
+                //const user = userCredential.user;
                 Toaster("User registered successfully")
             })
             .catch((error) => {
-                const errorCode = error.code;
+                //const errorCode = error.code;
                 const errorMessage = error.message;
                 Toaster(errorMessage)
             });
     }
 
     const validate = function(){
+
         if(username === "" || username.length<=2)
         {
             Toaster("Please enter a valid username with more than 2 characters")
@@ -56,9 +57,9 @@ const RegistrationScreen = function(){
         <View style={styling.container}>
         <View style={styling.inputContainer}>
             <TextInput autoCapitalize="none" autoCorrect={false} placeholder="Username" value={username} onChangeText={text => setUsername(text)} style={styling.input} />
-            <TextInput autoCapitalize="none" autoCorrect={false} placeholder="Email" value={email} onChangeText={text => setEmail(text)} style={styling.input} />
-            <TextInput autoCapitalize="none" autoCorrect={false} placeholder="Password" value={password} onChangeText={text => setPassword(text)} style={styling.input} secureTextEntry />
-            <TextInput autoCapitalize="none" autoCorrect={false} placeholder="Confirm Password" value={confirmPassword} onChangeText={text => setconfirmPassword(text)} style={styling.input} secureTextEntry />
+            <TextInput autoCapitalize="none" autoCorrect={false} placeholder="Email" value={email} onChangeText={text => setEmail(text.trim())} style={styling.input} />
+            <TextInput autoCapitalize="none" autoCorrect={false} placeholder="Password" value={password} onChangeText={text => setPassword(text.trim())} style={styling.input} secureTextEntry />
+            <TextInput autoCapitalize="none" autoCorrect={false} placeholder="Confirm Password" value={confirmPassword} onChangeText={text => setconfirmPassword(text.trim())} style={styling.input} secureTextEntry />
         </View>
 
         <View style={styling.buttonContainer}>

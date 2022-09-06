@@ -1,6 +1,8 @@
 import React,{useState} from "react";
 import {Text, TextInput, View, StyleSheet, TouchableOpacity} from "react-native"
 import Toaster from "../components/Toaster";
+import { auth } from "../../api/Firebase";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { useNavigation } from "@react-navigation/native";
 
 const LoginScreen = function(){
@@ -10,29 +12,45 @@ const LoginScreen = function(){
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
 
+    const loginUser = function(){
+
+      signInWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+          // Signed in 
+          const user = userCredential.user;
+          Toaster("Welcome "+user.email)
+          navigation.navigate("Side Navigation")
+      })
+      .catch((error) => {
+          //const errorCode = error.code;
+          const errorMessage = error.message;
+          Toaster(errorMessage)
+      });
+  }
+
     const validate = function(){
+
         if(email === "")
         {
-            Toaster("Please enter a valid email id")
-            return
+          Toaster("Please enter a valid email id")
+          return
         }
         if(password === "" || password.length<=5)
         {
-            Toaster("Please enter a valid password which is more than 5 characters")
-            return
+          Toaster("Please enter a valid password which is more than 5 characters")
+          return
         }
         else
         {
-            navigation.navigate("Side Navigation")
+          loginUser()
         }
     }
-
 
     return (
         <View style={styling.container}>
             <View style={styling.inputContainer}>
-                <TextInput autoCapitalize="none" autoCorrect={false} placeholder="Email" value={email} onChangeText={text => setEmail(text)} style={styling.input} />
-                <TextInput autoCapitalize="none" autoCorrect={false} placeholder="Password" value={password} onChangeText={text => setPassword(text)} style={styling.input} secureTextEntry />
+                <TextInput autoCapitalize="none" autoCorrect={false} placeholder="Email" value={email} onChangeText={text => setEmail(text.trim())} style={styling.input} />
+                <TextInput autoCapitalize="none" autoCorrect={false} placeholder="Password" value={password} onChangeText={text => setPassword(text.trim())} style={styling.input} secureTextEntry />
             </View> 
 
             <View style={styling.buttonContainer}>

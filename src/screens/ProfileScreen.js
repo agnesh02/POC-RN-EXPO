@@ -21,8 +21,6 @@ const ProfileScreen = function(){
                     <TouchableOpacity style={styling.buttonContainer}>
                         <Text>Opcion 2</Text> 
                     </TouchableOpacity>
-
-                   
                 
                 </View>
             </View>
