@@ -2,7 +2,28 @@ import React from "react";
 import { Text, View, StyleSheet, FlatList, TouchableOpacity, Image } from "react-native"
 import Toaster from "../components/Toaster";
 
-const DashboardScreen = function () {
+const DashboardScreen = function ({navigation}) {
+
+	//onst{userEmail} = route.params
+	//console.log(userEmail)
+
+	const onItemClick = function(title){
+		switch(title)
+		{
+			case "Weather":
+				Toaster(title)
+				return
+			case "Find & Connect":
+				Toaster(title)
+				return
+			case "Profile":
+				navigation.navigate("Profile")
+				return
+			case "Stream Video":
+				Toaster(title)
+				return
+		}
+	}
 
 	const data = [
 		{ id: 1, title: "Weather", color: "#FF4500", image: require("../../assets/cloudy-day.png") },
@@ -24,7 +45,7 @@ const DashboardScreen = function () {
 				renderItem={({ item }) => {
 					return (
 						<View>
-							<TouchableOpacity style={[styling.card, { backgroundColor: item.color }]} onPress={() => Toaster("item clicked")}>
+							<TouchableOpacity style={[styling.card, { backgroundColor: item.color }]} onPress={() => onItemClick(item.title) }>
 								<Image style={styling.cardImage} source={item.image} />
 							</TouchableOpacity>
 
@@ -47,12 +68,14 @@ const styling = StyleSheet.create({
 		backgroundColor: '#fff',
 	},
 	list: {
+		alignContent: "center",
 		marginTop: 50,
 		paddingHorizontal: 5,
 		backgroundColor: "#fff",
 	},
 	listContainer: {
-		alignItems: 'center'
+		justifyContent: "center",
+		alignItems: 'center', 
 	},
 	/******** card **************/
 	card: {
@@ -65,8 +88,9 @@ const styling = StyleSheet.create({
 		shadowRadius: 7.49,
 
 		elevation: 12,
-		marginVertical: 20,
-		marginHorizontal: 40,
+		marginTop: 50,
+		// marginVertical: 20,
+		marginHorizontal: 30,
 		backgroundColor: "#e2e2e2",
 		//flexBasis: '42%',
 		width: 120,
@@ -76,7 +100,7 @@ const styling = StyleSheet.create({
 		justifyContent: 'center'
 	},
 	cardHeader: {
-		paddingVertical: 17,
+		paddingVertical: 10,
 		paddingHorizontal: 16,
 		borderTopLeftRadius: 1,
 		borderTopRightRadius: 1,

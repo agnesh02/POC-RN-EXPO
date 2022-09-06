@@ -17,17 +17,16 @@ const LoginScreen = function () {
 	const [password, setPassword] = useState('')
 	const [visibility, setVisibility] = useState(false)
 
-	const getUserData = async function(){
+	const getUserData = async function () {
+
 		const firestore = getFirestore(app)
 		const docRef = doc(firestore, "USERS", email)
 		const docSnap = await getDoc(docRef)
 
-		if(docSnap.exists())
-		{
-			Toaster("Welcome "+docSnap.data().username+".")
+		if (docSnap.exists()) {
+			Toaster("Welcome " + docSnap.data().username + ".")
 		}
-		else
-		{
+		else {
 			Toaster("An error occurred")
 		}
 	}
@@ -40,7 +39,8 @@ const LoginScreen = function () {
 				setVisibility(false)
 				const user = userCredential.user;
 				getUserData()
-				//navigation.navigate("Side Navigation")
+				navigation.navigate("Side Navigation")
+				// navigation.navigate("Side Navigation", { screen: "Dashboard", params: { userEmail: email } })
 			})
 			.catch((error) => {
 				//const errorCode = error.code;
