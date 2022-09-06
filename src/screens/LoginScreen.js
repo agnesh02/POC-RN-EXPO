@@ -4,6 +4,8 @@ import Toaster from "../components/Toaster";
 import { app } from "../../api/FirebaseConfig";
 import { signInWithEmailAndPassword, getAuth } from "firebase/auth";
 import { useNavigation } from "@react-navigation/native";
+import { getFirestore } from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
 
 const LoginScreen = function () {
 
@@ -15,6 +17,21 @@ const LoginScreen = function () {
 	const [password, setPassword] = useState('')
 	const [visibility, setVisibility] = useState(false)
 
+	const getUserData = async function(){
+		const firestore = getFirestore(app)
+		const docRef = doc(firestore, "USERS", email)
+		const docSnap = await getDoc(docRef)
+
+		if(docSnap.exists())
+		{
+			Toaster("Welcome "+docSnap.data().username+".")
+		}
+		else
+		{
+			Toaster("An error occurred")
+		}
+	}
+
 	const loginUser = function () {
 
 		signInWithEmailAndPassword(auth, email, password)
@@ -22,8 +39,8 @@ const LoginScreen = function () {
 				// Signed in 
 				setVisibility(false)
 				const user = userCredential.user;
-				Toaster("Welcome " + user.email)
-				navigation.navigate("Side Navigation")
+				getUserData()
+				//navigation.navigate("Side Navigation")
 			})
 			.catch((error) => {
 				//const errorCode = error.code;
@@ -61,8 +78,10 @@ const LoginScreen = function () {
 				<TouchableOpacity style={styling.button} onPress={() => validate()}>
 					<Text style={styling.buttonText}>Login</Text>
 				</TouchableOpacity>
-				<TouchableOpacity style={[styling.button, styling.buttonOutline]} onPress={() => navigation.navigate("Registration")} >
-					<Text style={styling.buttonOutlineText}>Register</Text>
+			</View>
+			<View style={styling.buttonContainer2}>
+				<TouchableOpacity style={[styling.button2, styling.buttonOutline]} onPress={() => navigation.navigate("Registration")} >
+					<Text style={styling.buttonOutlineText}>Don't have an account ? Click here</Text>
 				</TouchableOpacity>
 			</View>
 
@@ -76,7 +95,9 @@ const styling = StyleSheet.create({
 	container: {
 		flex: 1,
 		justifyContent: 'center',
-		alignItems: 'center'
+		alignItems: 'center',
+		// borderWidth: 2,
+		// borderColor: "red"
 	},
 	inputContainer: {
 		width: '80%'
@@ -94,12 +115,26 @@ const styling = StyleSheet.create({
 		alignItems: 'center',
 		marginTop: 40,
 	},
+	buttonContainer2: {
+		position: "absolute",
+		flexDirection: "row",
+		justifyContent: 'center',
+		alignItems: "flex-end",
+		top: 600,
+	},
 	button: {
 		backgroundColor: '#0782F9',
 		width: '100%',
 		padding: 15,
 		borderRadius: 10,
 		alignItems: 'center',
+	},
+	button2: {
+		backgroundColor: '#0782F9',
+		padding: 5,
+		borderRadius: 16,
+		alignItems: 'center',
+		width: "80%"
 	},
 	buttonOutline: {
 		backgroundColor: 'white',
@@ -115,7 +150,7 @@ const styling = StyleSheet.create({
 	buttonOutlineText: {
 		color: '#0782F9',
 		fontWeight: '700',
-		fontSize: 16,
+		fontSize: 13,
 	},
 	pBar: {
 		borderColor: "black",
