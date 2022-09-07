@@ -7,13 +7,14 @@ import { app } from "../../api/FirebaseConfig";
 
 const EditProfileScreen = function({route}){
     
-    const{userEmail} = route.params
-    console.log(userEmail)
+    const{userEmail, usernameParam, fullnameParam, dobParam, contactParam, imageUrlParam} = route.params
+    console.log(route)
+    console.log(userEmail+" "+usernameParam+" "+fullnameParam+" "+dobParam+" "+contactParam+" "+imageUrlParam)
 
-    const [username, setUsername] = useState('')
-	const [fullname, setFullname] = useState('')
-    const [dob, setDob] = useState('')
-    const [contact, setContact] = useState('')
+    const [username, setUsername] = useState(usernameParam)
+	const [fullname, setFullname] = useState(fullnameParam)
+    const [dob, setDob] = useState(dobParam)
+    const [contact, setContact] = useState(contactParam)
 
 	const [visibility, setVisibility] = useState(false)
 
@@ -26,7 +27,7 @@ const EditProfileScreen = function({route}){
             username: username,
             fullname: fullname,
             dob: dob,
-            image_uri: "",
+            image_uri: imageUrlParam,
             phone: contact
         }
 

@@ -17,7 +17,6 @@ const ProfileScreen = function({navigation}){
     const firebaseStorage = getStorage(app);
     const storageRef = ref(firebaseStorage, `USERS/${userEmail}`);
 
-    
     const [fullname, setFullname] = useState('')
     const [username, setUsername] = useState('')
     const [dob, setDob] = useState('')
@@ -66,7 +65,7 @@ const ProfileScreen = function({navigation}){
             {imageUrl && <Image style={styling.avatar} source={ {uri: imageUrl} } />}
             {imageUrl === null && <Image style={styling.avatar} source={ require('../../assets/user.png') } />}
 
-            <TouchableOpacity style={styling.buttonContainer2} onPress={()=> navigation.navigate("Edit Profile", {userEmail: userEmail})}>
+            <TouchableOpacity style={styling.buttonContainer2} onPress={()=> navigation.navigate("Edit Profile", {userEmail: userEmail, usernameParam: username, fullnameParam: fullname, dobParam: dob, contactParam: contact, imageUrlParam: imageUrl })}>
                 <Text>Edit Profile</Text>  
             </TouchableOpacity> 
             <TouchableOpacity style={styling.buttonContainer} onPress={()=> navigation.navigate("Profile Picture", {userEmail: userEmail})}>
