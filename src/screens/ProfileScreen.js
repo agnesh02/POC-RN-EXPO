@@ -66,10 +66,10 @@ const ProfileScreen = function({navigation}){
             {imageUrl && <Image style={styling.avatar} source={ {uri: imageUrl} } />}
             {imageUrl === null && <Image style={styling.avatar} source={ require('../../assets/user.png') } />}
 
-            <TouchableOpacity style={styling.buttonContainer2}>
+            <TouchableOpacity style={styling.buttonContainer2} onPress={()=> navigation.navigate("Edit Profile", {userEmail: userEmail})}>
                 <Text>Edit Profile</Text>  
             </TouchableOpacity> 
-            <TouchableOpacity style={styling.buttonContainer} onPress={()=> navigation.navigate("Profile Picture")}>
+            <TouchableOpacity style={styling.buttonContainer} onPress={()=> navigation.navigate("Profile Picture", {userEmail: userEmail})}>
                 <Text>Change profile picture</Text> 
             </TouchableOpacity>
 

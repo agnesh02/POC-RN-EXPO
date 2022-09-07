@@ -3,10 +3,14 @@ import { View, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator } fr
 import * as ImagePicker from 'expo-image-picker'
 import Toaster from '../components/Toaster'
 import { app } from '../../api/FirebaseConfig'
-import { getStorage, ref, uploadBytes } from "firebase/storage";
-import { getAuth } from 'firebase/auth'
+import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
+import { doc, getFirestore, updateDoc } from "firebase/firestore";
 
-const ProfilePictureScreen = function () {
+//import { getAuth } from 'firebase/auth'
+
+const ProfilePictureScreen = function ({route}) {
+
+    const{userEmail} = route.params
 
     const [image, setImage] = useState(null);
     const [uploadingStatus, setUploadingStatus] = useState(false);
@@ -34,8 +38,9 @@ const ProfilePictureScreen = function () {
         setUploadingStatus(true)
         Toaster("Uploading file...This may take time depending on your connectivity")
         const firebaseStorage = getStorage(app)
-        const auth = getAuth(app)
-        const userEmail = auth.currentUser?.email
+        const firestore = getFirestore(app)
+        // const auth = getAuth(app)
+        // const userEmail = auth.currentUser?.email
 
         try{
             const response = await fetch(image)
@@ -44,8 +49,14 @@ const ProfilePictureScreen = function () {
             var storageRef = ref(firebaseStorage, `USERS/${userEmail}`)
             await uploadBytes(storageRef, blob)
                     .then((snapshot) => {
-                        Toaster("File uploaded successfully")
-                        setUploadingStatus(false)
+                            getDownloadURL(storageRef)
+                                .then((url) => {
+                                    const docRef = doc(firestore, "USERS", userEmail)
+                                    updateDoc(docRef, { image_uri: url })
+                                })
+                                .catch((error) => {
+                                    //Toaster(error.message)
+                                });
                     })
                     .catch((error) => {
                         //const errorCode = error.code;
@@ -53,6 +64,9 @@ const ProfilePictureScreen = function () {
                         Toaster(errorMessage)
                         setUploadingStatus(false)
                     })
+
+            Toaster("File uploaded successfully")
+            setUploadingStatus(false)
         }
         catch(e){
             console.log(e)

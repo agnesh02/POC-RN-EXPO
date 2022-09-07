@@ -26,7 +26,7 @@ const RegistrationScreen = function () {
                 image_uri: "",
                 phone: ""
             }
-            const appendData = await setDoc(doc(firestore, "USERS", email), data);
+            await setDoc(doc(firestore, "USERS", email), data);
             setVisibility(false)
             Toaster("User registered successfully")
         } catch (e) {

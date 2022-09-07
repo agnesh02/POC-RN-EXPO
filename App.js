@@ -12,6 +12,7 @@ import CustomDrawer from './src/components/CustomNavigationDrawer';
 
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import ProfilePictureScreen from './src/screens/ProfilePictureScreen';
+import EditProfileScreen from './src/screens/EditProfileScreen';
 
 
 function SideNavigation() {
@@ -41,7 +42,8 @@ function SideNavigation() {
 		>	
 			<Drawer.Screen name="Dashboard" component={DashboardScreen} />
 			<Drawer.Screen name="Profile" component={ProfileScreen} /*options={ { drawerIcon: ({color}) => (<Ionicons name="person-outline" size={22} color={color} />) } }*/ />
-			<Drawer.Screen name="Profile Picture" component={ProfilePictureScreen} />
+			<Drawer.Screen name="Profile Picture" component={ProfilePictureScreen} options={{drawerItemStyle:{display: "none"}}} />
+			<Drawer.Screen name="Edit Profile" component={EditProfileScreen} options={{drawerItemStyle: {display: "none"}}} />
 		</Drawer.Navigator>
 	);
 }
