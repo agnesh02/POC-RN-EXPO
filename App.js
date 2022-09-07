@@ -13,6 +13,8 @@ import CustomDrawer from './src/components/CustomNavigationDrawer';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import ProfilePictureScreen from './src/screens/ProfilePictureScreen';
 import EditProfileScreen from './src/screens/EditProfileScreen';
+import WeatherScreen from './src/screens/WeatherScreen';
+import LiveStreamScreen from './src/screens/LiveStreamScreen';
 
 
 function SideNavigation() {
@@ -34,7 +36,7 @@ function SideNavigation() {
 					},
 					drawerLabelStyle: {
 						marginLeft: 5,
-						fontFamily: 'Roboto-Medium',
+						//fontFamily: 'Roboto-Medium',
 						fontSize: 15,
 					}
 			  	}
@@ -44,6 +46,8 @@ function SideNavigation() {
 			<Drawer.Screen name="Profile" component={ProfileScreen} /*options={ { drawerIcon: ({color}) => (<Ionicons name="person-outline" size={22} color={color} />) } }*/ />
 			<Drawer.Screen name="Profile Picture" component={ProfilePictureScreen} options={{drawerItemStyle:{display: "none"}}} />
 			<Drawer.Screen name="Edit Profile" component={EditProfileScreen} options={{drawerItemStyle: {display: "none"}}} />
+			<Drawer.Screen name="Weather" component={WeatherScreen} />
+			<Drawer.Screen name="Live Stream" component={LiveStreamScreen} />
 		</Drawer.Navigator>
 	);
 }

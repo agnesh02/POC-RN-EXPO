@@ -11,7 +11,7 @@ const DashboardScreen = function ({navigation}) {
 		switch(title)
 		{
 			case "Weather":
-				Toaster(title)
+				navigation.navigate("Weather")
 				return
 			case "Find & Connect":
 				Toaster(title)
