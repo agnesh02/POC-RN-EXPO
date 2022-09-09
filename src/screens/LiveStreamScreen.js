@@ -1,9 +1,12 @@
 import React from "react";
 import {Text, StyleSheet} from "react-native"
+import {WebView} from "react-native-webview"
 
 const LiveStreamScreen = function(){
 
-    return <Text>LiveStream screen</Text>
+    return (
+        <WebView source={{ uri: 'https://google.co.in'}} />
+    )
 }
 
 const styling = StyleSheet.create({

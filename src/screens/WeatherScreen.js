@@ -85,7 +85,7 @@ const WeatherScreen = function () {
     }
 
     return (
-        <ScrollView style={styling.rootContainer} behavior="height">
+        <View style={styling.rootContainer} behavior="height">
 
             <View style={styling.searchContainer}>
                 <View style={styling.inputContainer}>
@@ -162,7 +162,7 @@ const WeatherScreen = function () {
 
                 : null}
 
-        </ScrollView>
+        </View>
 
     )
 
@@ -175,8 +175,7 @@ const styling = StyleSheet.create({
     },
     searchContainer: {
         marginTop: 30,
-        flexDirection: "row",
-        flex: 0.1,
+        flexDirection: "row"
     },
     inputContainer: {
         marginLeft: 8,
@@ -238,7 +237,7 @@ const styling = StyleSheet.create({
         justifyContent: "center"
     },
     parentContainer: {
-        flex: 0.37,
+        flex: 0.4,
         justifyContent: "flex-end"
     },
     container: {
