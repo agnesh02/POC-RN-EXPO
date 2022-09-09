@@ -1,5 +1,6 @@
+import { async } from "@firebase/util";
 import React, { useEffect, useState } from "react";
-import { Text, StyleSheet, TouchableOpacity, ActivityIndicator, TextInput, View, FlatList, Image, ScrollView } from "react-native"
+import { Text, StyleSheet, TouchableOpacity, ActivityIndicator, TextInput, View, FlatList, Image, ScrollView, KeyboardAvoidingView } from "react-native"
 import OpenWeatherMap from "../../api/OpenWeatherMap";
 
 const WeatherScreen = function () {
@@ -7,60 +8,92 @@ const WeatherScreen = function () {
     const [basicData, setBasicData] = useState([])
     const [mainData, setMainData] = useState([])
     const [windData, setWindData] = useState([])
+    const [icon, setIcon] = useState('')
+
+    const initialValue = [{
+        id: 0,
+        name: "",
+        image: "",
+        feelsLike: "",
+        maxTemp: "",
+        minTemp: "",
+        date: ""
+    }
+    ]
+
+
+    const [forecastData, setForecastData] = useState(initialValue)
 
     const getCurrentWeatherData = async function () {
-        const response = await OpenWeatherMap.get("?q=Kochi&APPID=b6ce0b3456949601e391e5a558343936&units=metric")
+        const response = await OpenWeatherMap.get("weather?q=Kochi&APPID=b6ce0b3456949601e391e5a558343936&units=metric")
         const fetchedData = response.data
 
         setBasicData(fetchedData.weather[0])
         setMainData(fetchedData.main)
         setWindData(fetchedData.wind)
+        setIcon(basicData.icon)
     }
-    useEffect(()=>{getCurrentWeatherData()},[])
 
-    const data = [
-        { id: 1, name: "Clear sky", image: "http://openweathermap.org/img/wn/01d@2x.png", date: "07/09" },
-        { id: 2, name: "Few clouds", image: "http://openweathermap.org/img/wn/02d@2x.png", date: "08/09" },
-        { id: 3, name: "Scattered clouds", image: "http://openweathermap.org/img/wn/03d@2x.png", date: "09/09" },
-        { id: 4, name: "Broken cloud", image: "http://openweathermap.org/img/wn/04d@2x.png", date: "10/09" },
-        { id: 5, name: "Shower rain", image: "http://openweathermap.org/img/wn/10d@2x.png", date: "11/09" },
-    ]
+    const getForecastData = async function () {
+        const response = await OpenWeatherMap.get("forecast?q=Kochi&APPID=b6ce0b3456949601e391e5a558343936&units=metric&cnt=6")
+        const fetchedData = response.data
+        // console.log(fetchedData.list[0].dt_txt)
+        // console.log(fetchedData.list[0].main)
+        // console.log(fetchedData.list[0].weather[0])
+
+        const data = []
+
+        for (let i = 1; i < 6; i++) {
+            data.push({
+                id: i,
+                name: fetchedData.list[i].weather[0].description,
+                image: fetchedData.list[0].weather[0].icon,
+                feelsLike: fetchedData.list[i].main.feels_like,
+                maxTemp: fetchedData.list[1].main.temp_max,
+                minTemp: fetchedData.list[i].main.temp_min,
+                date: fetchedData.list[i].dt_txt
+            })
+        }
+        setForecastData(data)
+    }
+
+    useEffect(() => { getCurrentWeatherData(); getForecastData() }, [])
 
     return (
-        <View style={styling.rootContainer}>
+        <KeyboardAvoidingView style={styling.rootContainer} behavior="height">
 
-            <View style={styling.searchContainer}> 
+            <View style={styling.searchContainer}>
                 <View style={styling.inputContainer}>
                     <TextInput autoCapitalize="none" autoCorrect={false} placeholder="Enter a city" style={styling.input} />
                 </View>
                 <TouchableOpacity style={styling.GoButton} onPress={() => { }}>
-                    <Text style={styling.GoButtonText}>Go</Text>
+                    <Text style={styling.GoButtonText}>GO</Text>
                 </TouchableOpacity>
             </View>
 
             <View style={styling.mainCardContainer}>
 
                 <View style={styling.cardInfoHeader}>
-                    <Image style={styling.image2} source={{ uri: "http://openweathermap.org/img/wn/"+`${basicData.icon}`+"@2x.png" }} />
+                    <Image style={styling.image2} source={{ uri: "http://openweathermap.org/img/wn/" + `${icon}` + "@2x.png" }} />
                     <Text style={styling.name}>{basicData.main}</Text>
-                    <Text style={{alignSelf: "center", fontSize: 15}}>{basicData.description}</Text>
+                    <Text style={{ alignSelf: "center", fontSize: 15 }}>{basicData.description}</Text>
                 </View>
-                
+
                 <View style={styling.cardMain}>
                     <View style={styling.cardInfo}>
-                        <Image source={require("../../assets/hot.png")} style={{width: 40, height: 40}}/>
-                        <Text style={{fontSize: 25, marginLeft: 20, marginTop: 5}}> {`${Math.round(mainData.temp)}`}°C </Text>
+                        <Image source={require("../../assets/hot.png")} style={{ width: 40, height: 40 }} />
+                        <Text style={{ fontSize: 25, marginLeft: 20, marginTop: 5 }}> {`${Math.round(mainData.temp)}`}°C </Text>
                     </View>
                     <View style={styling.cardInfo}>
-                        <Text style={{fontSize: 16, marginTop: 5}} >Feels Like: {`${Math.round(mainData.feels_like)}`}°C  </Text>
-                        <Text style={{fontSize: 16, marginLeft: 80, marginTop: 5}} >Wind: {windData.speed} m/s</Text>
+                        <Text style={{ fontSize: 16, marginTop: 5 }} >Feels Like: {`${Math.round(mainData.feels_like)}`}°C  </Text>
+                        <Text style={{ fontSize: 16, marginLeft: 80, marginTop: 5 }} >Wind: {windData.speed} m/s</Text>
                     </View>
                     <View style={styling.cardInfo}>
-                        <Text style={{fontSize: 16, marginTop: 5, color: "red"}}>Max Temp : {`${Math.round(mainData.temp_max)}`}°C </Text>
-                        <Text style={{fontSize: 16, marginLeft: 50, marginTop: 5, color: "blue"}}>Min Temp : {`${Math.round(mainData.temp_min)}`}°C </Text>
+                        <Text style={{ fontSize: 16, marginTop: 5, color: "red" }}>Max Temp : {`${Math.round(mainData.temp_max)}`}°C </Text>
+                        <Text style={{ fontSize: 16, marginLeft: 50, marginTop: 5, color: "blue" }}>Min Temp : {`${Math.round(mainData.temp_min)}`}°C </Text>
                     </View>
                     <View style={styling.cardInfo}>
-                        <Text style={{fontSize: 16, marginTop: 10, color: "#5ea5d4"}}>Humidity : 87%</Text>
+                        <Text style={{ fontSize: 16, marginTop: 10, color: "#5ea5d4" }}>Humidity : 87%</Text>
                     </View>
                 </View>
 
@@ -71,22 +104,22 @@ const WeatherScreen = function () {
                     <FlatList
                         horizontal={true}
                         style={styling.contentList}
-                        data={data}
+                        data={forecastData}
                         keyExtractor={(item) => {
                             return item.id;
                         }}
                         renderItem={({ item }) => {
                             return (
                                 <TouchableOpacity style={styling.card} onPress={() => { }}>
-                                    <Image style={styling.image} source={{ uri: item.image }} />
+                                    <Image style={styling.image} source={{ uri: "http://openweathermap.org/img/wn/" + `${item.image}` + "@2x.png" }} />
                                     <View style={styling.cardContent}>
                                         <Text style={styling.name}>{item.name}</Text>
                                         <Text style={styling.feelsLike}>Feels Like : </Text>
-                                        <Text style={styling.feelsLikeTemp}>31°C</Text>
-                                        <Text style={styling.maxTemp}>Max Temp : 30°C</Text>
-                                        <Text style={styling.minTemp}>Min Temp : 28°C</Text>
+                                        <Text style={styling.feelsLikeTemp}>{`${Math.round(item.feelsLike)}`}°C</Text>
+                                        <Text style={styling.maxTemp}>Max Temp : {`${Math.round(item.maxTemp)}`}°C</Text>
+                                        <Text style={styling.minTemp}>Min Temp : {`${Math.round(item.minTemp)}`}°C</Text>
                                         <TouchableOpacity style={styling.followButton} onPress={() => { }}>
-                                            <Text style={styling.followButtonText}>{item.date} 13:00hrs</Text>
+                                            <Text style={styling.followButtonText}>{item.date} hrs</Text>
                                         </TouchableOpacity>
                                     </View>
                                 </TouchableOpacity>
@@ -94,8 +127,8 @@ const WeatherScreen = function () {
                         }} />
                 </View>
             </View>
-            
-        </View>
+
+        </KeyboardAvoidingView>
 
     )
 
@@ -109,21 +142,21 @@ const styling = StyleSheet.create({
     searchContainer: {
         marginTop: 30,
         flexDirection: "row",
-        flex:0.1,
+        flex: 0.1,
     },
     inputContainer: {
         marginLeft: 8,
-		width: '75%',
-	},
-	input: {
+        width: '75%',
+    },
+    input: {
         borderWidth: 1,
         borderColor: "black",
-		backgroundColor: 'white',
-		paddingHorizontal: 15,
-		paddingVertical: 10,
-		borderRadius: 10,
-		marginTop: 5,
-	},
+        backgroundColor: 'white',
+        paddingHorizontal: 15,
+        paddingVertical: 10,
+        borderRadius: 10,
+        marginTop: 5,
+    },
     GoButton: {
         height: 35,
         width: 60,
@@ -139,8 +172,6 @@ const styling = StyleSheet.create({
         fontSize: 15,
     },
     cardInfoHeader: {
-        borderWidth: 2,
-        borderColor: "red",
         marginTop: 10,
         flex: 0.4,
         alignSelf: "center",
@@ -237,7 +268,7 @@ const styling = StyleSheet.create({
         color: "purple"
     },
     feelsLikeTemp: {
-        marginTop: -10,
+        marginTop: -5,
         fontSize: 18,
         flex: 1,
         alignSelf: 'center',
@@ -276,7 +307,7 @@ const styling = StyleSheet.create({
         color: "blue",
         fontSize: 12,
     },
-   
+
 });
 
 export default WeatherScreen
