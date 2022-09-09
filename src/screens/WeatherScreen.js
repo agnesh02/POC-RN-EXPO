@@ -1,14 +1,17 @@
-import { async } from "@firebase/util";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Text, StyleSheet, TouchableOpacity, ActivityIndicator, TextInput, View, FlatList, Image, ScrollView, KeyboardAvoidingView } from "react-native"
 import OpenWeatherMap from "../../api/OpenWeatherMap";
+import Toaster from "../components/Toaster";
 
 const WeatherScreen = function () {
 
+    const [cityName, setCityName] = useState('')
     const [basicData, setBasicData] = useState([])
     const [mainData, setMainData] = useState([])
     const [windData, setWindData] = useState([])
     const [icon, setIcon] = useState('')
+    const [visibility, setVisibility] = useState(false)
+    const [hasData, setHasData] = useState(false)
 
     const initialValue = [{
         id: 0,
@@ -21,25 +24,47 @@ const WeatherScreen = function () {
     }
     ]
 
-
     const [forecastData, setForecastData] = useState(initialValue)
 
-    const getCurrentWeatherData = async function () {
-        const response = await OpenWeatherMap.get("weather?q=Kochi&APPID=b6ce0b3456949601e391e5a558343936&units=metric")
-        const fetchedData = response.data
+    const validate = async function () {
+        setVisibility(true)
+        if (cityName === '') {
+            Toaster("Please enter a valid city name")
+            setVisibility(false)
+            return
+        }
 
-        setBasicData(fetchedData.weather[0])
-        setMainData(fetchedData.main)
-        setWindData(fetchedData.wind)
-        setIcon(basicData.icon)
+        Toaster("Fetching weather details of "+cityName)
+        const currentUrl = "weather?q=" + `${cityName}` + "&APPID=b6ce0b3456949601e391e5a558343936&units=metric"
+        getCurrentWeatherData(currentUrl)
     }
 
-    const getForecastData = async function () {
-        const response = await OpenWeatherMap.get("forecast?q=Kochi&APPID=b6ce0b3456949601e391e5a558343936&units=metric&cnt=6")
+    const getCurrentWeatherData = async function (currentWeatherUrl) {
+
+        try{
+            const response = await OpenWeatherMap.get(currentWeatherUrl)
+            const fetchedData = response.data
+    
+            setBasicData(fetchedData.weather[0])
+            setMainData(fetchedData.main)
+            setWindData(fetchedData.wind)
+            setIcon(fetchedData.weather[0].icon)
+    
+            const forecastUrl = "forecast?q=" + `${cityName}` + "&APPID=b6ce0b3456949601e391e5a558343936&units=metric&cnt=6"
+            getForecastData(forecastUrl)
+        }
+        catch(e)
+        {
+            Toaster("Some error occurred. Try a different city")
+            setVisibility(false)
+            return
+        }
+       
+    }
+
+    const getForecastData = async function (forecastWeatherUrl) {
+        const response = await OpenWeatherMap.get(forecastWeatherUrl)
         const fetchedData = response.data
-        // console.log(fetchedData.list[0].dt_txt)
-        // console.log(fetchedData.list[0].main)
-        // console.log(fetchedData.list[0].weather[0])
 
         const data = []
 
@@ -55,80 +80,89 @@ const WeatherScreen = function () {
             })
         }
         setForecastData(data)
+        setVisibility(false)
+        setHasData(true)
     }
 
-    useEffect(() => { getCurrentWeatherData(); getForecastData() }, [])
-
     return (
-        <KeyboardAvoidingView style={styling.rootContainer} behavior="height">
+        <ScrollView style={styling.rootContainer} behavior="height">
 
             <View style={styling.searchContainer}>
                 <View style={styling.inputContainer}>
-                    <TextInput autoCapitalize="none" autoCorrect={false} placeholder="Enter a city" style={styling.input} />
+                    <TextInput autoCapitalize="none" autoCorrect={false} placeholder="Enter a city" style={styling.input} onChangeText={(text) => setCityName(text.trim())} value={cityName} onPressIn={() => setHasData(false)} />
                 </View>
-                <TouchableOpacity style={styling.GoButton} onPress={() => { }}>
+                <TouchableOpacity style={styling.GoButton} onPress={() => { validate() }}>
                     <Text style={styling.GoButtonText}>GO</Text>
                 </TouchableOpacity>
             </View>
 
-            <View style={styling.mainCardContainer}>
+            {visibility ? <ActivityIndicator style={{marginTop: 50}} size="large" /> : null}
 
-                <View style={styling.cardInfoHeader}>
-                    <Image style={styling.image2} source={{ uri: "http://openweathermap.org/img/wn/" + `${icon}` + "@2x.png" }} />
-                    <Text style={styling.name}>{basicData.main}</Text>
-                    <Text style={{ alignSelf: "center", fontSize: 15 }}>{basicData.description}</Text>
+            {hasData ?
+
+                <View style={styling.mainCardContainer}>
+
+                    <View style={styling.cardInfoHeader}>
+                        <Image style={styling.image2} source={{ uri: "http://openweathermap.org/img/wn/" + `${icon}` + "@2x.png" }} />
+                        <Text style={styling.name}>{basicData.main}</Text>
+                        <Text style={{ alignSelf: "center", fontSize: 15 }}>{basicData.description}</Text>
+                    </View>
+
+                    <View style={styling.cardMain}>
+                        <View style={styling.cardInfo}>
+                            <Image source={require("../../assets/hot.png")} style={{ width: 40, height: 40 }} />
+                            <Text style={{ fontSize: 25, marginLeft: 20, marginTop: 5 }}> {`${Math.round(mainData.temp)}`}°C </Text>
+                        </View>
+                        <View style={styling.cardInfo}>
+                            <Text style={{ fontSize: 16, marginTop: 5 }} >Feels Like: {`${Math.round(mainData.feels_like)}`}°C  </Text>
+                            <Text style={{ fontSize: 16, marginLeft: 80, marginTop: 5 }} >Wind: {windData.speed} m/s</Text>
+                        </View>
+                        <View style={styling.cardInfo}>
+                            <Text style={{ fontSize: 16, marginTop: 5, color: "red" }}>Max Temp : {`${Math.round(mainData.temp_max)}`}°C </Text>
+                            <Text style={{ fontSize: 16, marginLeft: 50, marginTop: 5, color: "blue" }}>Min Temp : {`${Math.round(mainData.temp_min)}`}°C </Text>
+                        </View>
+                        <View style={styling.cardInfo}>
+                            <Text style={{ fontSize: 16, marginTop: 10, color: "#5ea5d4" }}>Humidity : {`${Math.round(mainData.humidity)}`}%</Text>
+                        </View>
+                    </View>
+
                 </View>
 
-                <View style={styling.cardMain}>
-                    <View style={styling.cardInfo}>
-                        <Image source={require("../../assets/hot.png")} style={{ width: 40, height: 40 }} />
-                        <Text style={{ fontSize: 25, marginLeft: 20, marginTop: 5 }}> {`${Math.round(mainData.temp)}`}°C </Text>
-                    </View>
-                    <View style={styling.cardInfo}>
-                        <Text style={{ fontSize: 16, marginTop: 5 }} >Feels Like: {`${Math.round(mainData.feels_like)}`}°C  </Text>
-                        <Text style={{ fontSize: 16, marginLeft: 80, marginTop: 5 }} >Wind: {windData.speed} m/s</Text>
-                    </View>
-                    <View style={styling.cardInfo}>
-                        <Text style={{ fontSize: 16, marginTop: 5, color: "red" }}>Max Temp : {`${Math.round(mainData.temp_max)}`}°C </Text>
-                        <Text style={{ fontSize: 16, marginLeft: 50, marginTop: 5, color: "blue" }}>Min Temp : {`${Math.round(mainData.temp_min)}`}°C </Text>
-                    </View>
-                    <View style={styling.cardInfo}>
-                        <Text style={{ fontSize: 16, marginTop: 10, color: "#5ea5d4" }}>Humidity : {`${Math.round(mainData.humidity)}`}%</Text>
+                : null}
+
+            {hasData ?
+                <View style={styling.parentContainer}>
+                    <View style={styling.container}>
+                        <FlatList
+                            horizontal={true}
+                            style={styling.contentList}
+                            data={forecastData}
+                            keyExtractor={(item) => {
+                                return item.id;
+                            }}
+                            renderItem={({ item }) => {
+                                return (
+                                    <TouchableOpacity style={styling.card} onPress={() => { }}>
+                                        <Image style={styling.image} source={{ uri: "http://openweathermap.org/img/wn/" + `${item.image}` + "@2x.png" }} />
+                                        <View style={styling.cardContent}>
+                                            <Text style={styling.name}>{item.name}</Text>
+                                            <Text style={styling.feelsLike}>Feels Like : </Text>
+                                            <Text style={styling.feelsLikeTemp}>{`${Math.round(item.feelsLike)}`}°C</Text>
+                                            <Text style={styling.maxTemp}>Max Temp : {`${Math.round(item.maxTemp)}`}°C</Text>
+                                            <Text style={styling.minTemp}>Min Temp : {`${Math.round(item.minTemp)}`}°C</Text>
+                                            <TouchableOpacity style={styling.followButton} onPress={() => { }}>
+                                                <Text style={styling.followButtonText}>{item.date} hrs</Text>
+                                            </TouchableOpacity>
+                                        </View>
+                                    </TouchableOpacity>
+                                )
+                            }} />
                     </View>
                 </View>
 
-            </View>
+                : null}
 
-            <View style={styling.parentContainer}>
-                <View style={styling.container}>
-                    <FlatList
-                        horizontal={true}
-                        style={styling.contentList}
-                        data={forecastData}
-                        keyExtractor={(item) => {
-                            return item.id;
-                        }}
-                        renderItem={({ item }) => {
-                            return (
-                                <TouchableOpacity style={styling.card} onPress={() => { }}>
-                                    <Image style={styling.image} source={{ uri: "http://openweathermap.org/img/wn/" + `${item.image}` + "@2x.png" }} />
-                                    <View style={styling.cardContent}>
-                                        <Text style={styling.name}>{item.name}</Text>
-                                        <Text style={styling.feelsLike}>Feels Like : </Text>
-                                        <Text style={styling.feelsLikeTemp}>{`${Math.round(item.feelsLike)}`}°C</Text>
-                                        <Text style={styling.maxTemp}>Max Temp : {`${Math.round(item.maxTemp)}`}°C</Text>
-                                        <Text style={styling.minTemp}>Min Temp : {`${Math.round(item.minTemp)}`}°C</Text>
-                                        <TouchableOpacity style={styling.followButton} onPress={() => { }}>
-                                            <Text style={styling.followButtonText}>{item.date} hrs</Text>
-                                        </TouchableOpacity>
-                                    </View>
-                                </TouchableOpacity>
-                            )
-                        }} />
-                </View>
-            </View>
-
-        </KeyboardAvoidingView>
+        </ScrollView>
 
     )
 
@@ -306,8 +340,7 @@ const styling = StyleSheet.create({
     followButtonText: {
         color: "blue",
         fontSize: 12,
-    },
-
+    }
 });
 
 export default WeatherScreen
