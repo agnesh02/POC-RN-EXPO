@@ -93,7 +93,7 @@ const WeatherScreen = function () {
                         <Text style={{ fontSize: 16, marginLeft: 50, marginTop: 5, color: "blue" }}>Min Temp : {`${Math.round(mainData.temp_min)}`}°C </Text>
                     </View>
                     <View style={styling.cardInfo}>
-                        <Text style={{ fontSize: 16, marginTop: 10, color: "#5ea5d4" }}>Humidity : 87%</Text>
+                        <Text style={{ fontSize: 16, marginTop: 10, color: "#5ea5d4" }}>Humidity : {`${Math.round(mainData.humidity)}`}%</Text>
                     </View>
                 </View>
 
@@ -268,7 +268,7 @@ const styling = StyleSheet.create({
         color: "purple"
     },
     feelsLikeTemp: {
-        marginTop: -5,
+        marginTop: -10,
         fontSize: 18,
         flex: 1,
         alignSelf: 'center',
@@ -280,7 +280,7 @@ const styling = StyleSheet.create({
         alignSelf: 'center',
         color: "red",
         marginLeft: -55,
-        marginTop: 10
+        marginTop: 0
     },
     minTemp: {
         fontSize: 14,
@@ -291,7 +291,7 @@ const styling = StyleSheet.create({
         marginTop: -5
     },
     followButton: {
-        marginTop: 10,
+        marginTop: 5,
         marginLeft: -55,
         height: 35,
         width: 100,
