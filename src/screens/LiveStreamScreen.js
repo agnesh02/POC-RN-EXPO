@@ -12,7 +12,7 @@ const LiveStreamScreen = function ({ navigation }) {
 
         if(url === '')
         {
-            if (ip === "" || ip.includes('.') || ip.includes(',') || ip.includes('-')) {
+            if (ip === "" || ip.includes(',') || ip.includes('-')) {
                 Toaster("Please enter a valid ip address")
                 return
             }

@@ -16,6 +16,7 @@ import EditProfileScreen from './src/screens/EditProfileScreen';
 import WeatherScreen from './src/screens/WeatherScreen';
 import LiveStreamScreen from './src/screens/LiveStreamScreen';
 import LiveContentScreen from './src/screens/LiveContentScreen';
+import ListBleDevicesScreen from './src/screens/ListBleDevicesScreen';
 
 
 function SideNavigation() {
@@ -50,6 +51,7 @@ function SideNavigation() {
 			<Drawer.Screen name="Weather" component={WeatherScreen} />
 			<Drawer.Screen name="Live Stream" component={LiveStreamScreen} />
 			<Drawer.Screen name="Live Content" component={LiveContentScreen} options={{drawerItemStyle: {display: "none"}}}/>
+			<Drawer.Screen name="Bluetooth" component={ListBleDevicesScreen} />
 		</Drawer.Navigator>
 	);
 }

@@ -14,7 +14,7 @@ const DashboardScreen = function ({navigation}) {
 				navigation.navigate("Weather")
 				return
 			case "Find & Connect":
-				Toaster(title)
+				navigation.navigate("Bluetooth")
 				return
 			case "Profile":
 				navigation.navigate("Profile")
