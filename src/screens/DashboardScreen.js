@@ -20,7 +20,7 @@ const DashboardScreen = function ({navigation}) {
 				navigation.navigate("Profile")
 				return
 			case "Stream Video":
-				Toaster(title)
+				navigation.navigate("Live Stream")
 				return
 		}
 	}
